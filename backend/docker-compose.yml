@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: cargomax-db
+    environment:
+      POSTGRES_DB: cargomax
+      POSTGRES_USER: cargomax
+      POSTGRES_PASSWORD: cargomax_secret
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cargomax"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - cargomax
+
+  api:
+    build: .
+    container_name: cargomax-api
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://cargomax:cargomax_secret@postgres:5432/cargomax?sslmode=disable
+      PORT: "8080"
+    env_file:
+      - .env
+    networks:
+      - cargomax
+
+volumes:
+  pgdata:
+
+networks:
+  cargomax:
+    driver: bridge
