@@ -138,7 +138,20 @@ func main() {
 	r.Use(chiMiddleware.Recoverer) // Prevent panics from crashing the server (e.g. unauthenticated GraphQL requests).
 	r.Use(middleware.LoggingMiddleware)
 	r.Use(cors.Handler(cors.Options{
-		AllowOriginFunc:  func(r *http.Request, origin string) bool { return true },
+		AllowOriginFunc: func(r *http.Request, origin string) bool {
+			allowed := []string{
+				cfg.FrontendURL,
+				"http://localhost:3000",
+				"http://localhost:" + cfg.FrontendPort,
+				"http://" + cfg.AppHost + ":" + cfg.FrontendPort,
+			}
+			for _, a := range allowed {
+				if origin == a {
+					return true
+				}
+			}
+			return false
+		},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-Requested-With"},
 		ExposedHeaders:   []string{"Set-Cookie"},

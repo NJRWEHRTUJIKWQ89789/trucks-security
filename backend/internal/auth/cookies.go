@@ -10,8 +10,10 @@ const (
 	refreshCookieName = "cargomax_refresh"
 )
 
-// SetAuthCookies writes the access and refresh tokens as HttpOnly, SameSite=Strict
-// cookies on the response.
+// SetAuthCookies writes the access and refresh tokens as HttpOnly, SameSite=Lax
+// cookies on the response. Lax is used instead of Strict so that cookies are
+// sent on cross-origin requests between the frontend and API when they share the
+// same host but use different ports (e.g. :3000 and :8080).
 func SetAuthCookies(w http.ResponseWriter, accessToken, refreshToken, domain string, secure bool) {
 	http.SetCookie(w, &http.Cookie{
 		Name:     accessCookieName,
@@ -21,7 +23,7 @@ func SetAuthCookies(w http.ResponseWriter, accessToken, refreshToken, domain str
 		MaxAge:   int((15 * time.Minute).Seconds()),
 		HttpOnly: true,
 		Secure:   secure,
-		SameSite: http.SameSiteStrictMode,
+		SameSite: http.SameSiteLaxMode,
 	})
 
 	http.SetCookie(w, &http.Cookie{
@@ -32,7 +34,7 @@ func SetAuthCookies(w http.ResponseWriter, accessToken, refreshToken, domain str
 		MaxAge:   int((7 * 24 * time.Hour).Seconds()),
 		HttpOnly: true,
 		Secure:   secure,
-		SameSite: http.SameSiteStrictMode,
+		SameSite: http.SameSiteLaxMode,
 	})
 }
 
@@ -48,7 +50,7 @@ func ClearAuthCookies(w http.ResponseWriter, domain string, secure bool) {
 		MaxAge:   -1,
 		HttpOnly: true,
 		Secure:   secure,
-		SameSite: http.SameSiteStrictMode,
+		SameSite: http.SameSiteLaxMode,
 	})
 
 	http.SetCookie(w, &http.Cookie{
@@ -59,7 +61,7 @@ func ClearAuthCookies(w http.ResponseWriter, domain string, secure bool) {
 		MaxAge:   -1,
 		HttpOnly: true,
 		Secure:   secure,
-		SameSite: http.SameSiteStrictMode,
+		SameSite: http.SameSiteLaxMode,
 	})
 }
 

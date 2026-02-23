@@ -31,6 +31,9 @@ services:
     environment:
       DATABASE_URL: postgres://cargomax:cargomax_secret@postgres:5432/cargomax?sslmode=disable
       PORT: "8080"
+      APP_HOST: "${APP_HOST:-localhost}"
+      FRONTEND_PORT: "${FRONTEND_PORT:-3000}"
+      COOKIE_SECURE: "${COOKIE_SECURE:-false}"
     env_file:
       - .env
     networks:
